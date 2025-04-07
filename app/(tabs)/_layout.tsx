@@ -1,44 +1,63 @@
 import { Tabs } from 'expo-router';
-import React from 'react';
-import { Platform } from 'react-native';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { theme } from '@/src/themes/theme';
 
-import { HapticTab } from '@/components/HapticTab';
-import { IconSymbol } from '@/components/ui/IconSymbol';
-import TabBarBackground from '@/components/ui/TabBarBackground';
-import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
+interface TabBarIconProps {
+    color: string;
+    size: number;
+    focused: boolean;
+}
+
+const createScreenOptions = (
+  iconName: keyof typeof Ionicons.glyphMap,
+  title?: string,
+  customColor?: string
+) => {
+  return {
+    headerShown: false,
+    tabBarActiveTintColor: theme.colors.vibrantBlue,
+    tabBarInactiveTintColor: theme.colors.gray,
+    tabBarStyle: {
+        backgroundColor: theme.colors.black,
+        borderTopWidth: 0,
+        position: 'absolute',
+        elevation: 0,
+        height: theme.sizes.xxxxl,
+    },
+    title: title || iconName,
+    tabBarIcon: ({ size, color }: TabBarIconProps) => {
+      const iconColor = customColor ?? color;
+      return <Ionicons name={iconName} size={size} color={iconColor} />;
+    },
+  };
+};
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
-        tabBarButton: HapticTab,
-        tabBarBackground: TabBarBackground,
-        tabBarStyle: Platform.select({
-          ios: {
-            // Use a transparent background on iOS to show the blur effect
-            position: 'absolute',
-          },
-          default: {},
-        }),
-      }}>
+        tabBarShowLabel: false,
+      }}
+    >
       <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
-        }}
+        name="home"
+        options={createScreenOptions('home', 'Home')}
       />
       <Tabs.Screen
-        name="explore"
-        options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
-        }}
+        name="bookmarks"
+        options={createScreenOptions('bookmark', 'Bookmark')}
+      />
+      <Tabs.Screen
+        name="create"
+        options={createScreenOptions('add-circle', 'Create')}
+      />
+      <Tabs.Screen
+        name="notifications"
+        options={createScreenOptions('heart', 'Notifications', theme.colors.red)}
+      />
+      <Tabs.Screen
+        name="profile"
+        options={createScreenOptions('person-circle', 'Profile', theme.colors.accent)}
       />
     </Tabs>
   );
